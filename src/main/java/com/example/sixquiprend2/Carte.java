@@ -26,5 +26,5 @@ public class Carte {
         } else {
             return 1; // Aucun critère spécial, 1 tête de bœuf
         }
-    }
+  }
 }

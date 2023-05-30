@@ -1,0 +1,44 @@
+package com.example.demo.Model;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.ArrayList;
+
+
+@Getter
+@Setter
+@AllArgsConstructor
+public class Player {
+    private String name;
+    private String LastName;
+    private ArrayList<Card> cards;
+    private int score;
+    public Player(String name, String LastName) {
+        this.LastName = LastName;
+        this.name = name;
+        cards = new ArrayList<Card>();
+    }
+
+    public void addCard(Card card) {
+        cards.add(card);
+    }
+
+    public void removeCard(int index) {
+        cards.remove(index);
+    }
+
+    public Card getCard(int index) {
+        return cards.get(index);
+    }
+
+    public int getCardsNumber() {
+        return cards.size();
+    }
+
+    public void score(int pointsToAdd) {
+        score += pointsToAdd;
+    }
+
+}

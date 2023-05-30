@@ -1,4 +1,4 @@
-package com.example.jeu6quiprend;
+package com.example.sixquiprend;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

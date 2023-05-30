@@ -1,0 +1,158 @@
+package com.example.demo.Controler;
+
+import com.example.demo.Model.Card;
+import com.example.demo.Model.Pile;
+import com.example.demo.Model.Player;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import static com.example.demo.Controler.Settings.players;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+
+
+public class CardGame {
+    public TextField playerNameField;
+    @FXML private HBox pile1;
+    @FXML private HBox pile2;
+    @FXML private HBox pile3;
+    @FXML private HBox pile4;
+    @FXML
+    private AnchorPane mainAnchorPane;
+
+    public TextField playerLastNameField;
+    @FXML
+    private Button startButton;
+
+    private ArrayList<Pile> pile;
+    public CardGame() {
+        pile = new ArrayList<Pile>();
+    }
+    public String getPlayerName() {
+        return playerNameField.getText();
+    }
+    public String getPlayerLastName() {
+        return playerLastNameField.getText();
+    }
+
+    @FXML
+    public void initialize() {
+        // Initialize the UI components and set event handlers
+        startButton.setOnAction(this::startGame);
+    }
+
+    @FXML
+    public void startGame(ActionEvent event) {
+        mainAnchorPane.getChildren().clear();
+        Image backgroundImage = new Image("D:\\Download\\demo\\src\\main\\resources\\com\\example\\demo\\img\\plateauje.png");
+
+        // Create an ImageView with the loaded image
+        ImageView backgroundImageView = new ImageView(backgroundImage);
+
+        // Set the size of the ImageView to match the scene
+        backgroundImageView.fitWidthProperty().bind(mainAnchorPane.widthProperty());
+        backgroundImageView.fitHeightProperty().bind(mainAnchorPane.heightProperty());
+
+        // Add the ImageView as the first child of the root pane
+        mainAnchorPane.getChildren().add(0, backgroundImageView);
+
+
+        DistribuerCarte();
+
+
+
+    }
+    public void DistribuerCarte(){
+        ArrayList<Card> cards = new ArrayList<Card>();
+        pile.clear();
+        cards.clear();
+        // Creer 4 rangées de carte
+        for (int i = 0; i < 4 ; i++){
+            pile.add(new Pile());
+        }
+        for (int i = 1; i <= 104; i++) {
+            int value = i;
+            int heads = 0;
+            if (i % 10 == 5) {
+                heads = i == 55 ? 7 : 2;
+            } else if (i % 10 == 0) {
+                heads = 3;
+            } else if (i == 11 || i == 22 || i == 33 || i == 44 || i == 55 || i == 66 || i == 77 || i == 88 || i == 99) {
+                heads = 5;
+            } else {
+                heads = 1;
+            }
+            cards.add(new Card(value, heads));
+        }
+        Collections.shuffle(cards);
+
+        int deck = 0;
+        //Une carte par pile
+        for (int i = 0 ; i < 4; i++ ){
+            pile.get(i).addCard(cards.get(deck));
+            deck ++;
+
+        }
+        //Distribuer 10 cartes au joueur
+        for (Player player : players){
+            for (int i=0; i<10; i++){
+                player.addCard(cards.get(deck));
+                deck ++;
+                int margin = 25;
+                int startmargin = 60;
+                ImageView imageView = new ImageView();
+                imageView.setFitWidth(55);
+                imageView.setFitHeight(80);
+
+                // Set the position of the image view
+                imageView.setTranslateX(startmargin + i * (45 + margin));
+                imageView.setTranslateY(680);
+
+                // Set the image based on the card's properties
+                String imagePath = "D:\\Download\\demo\\src\\main\\resources\\com\\example\\demo\\img\\" + cards.get(deck) + ".png";
+                Image cardImage = new Image(imagePath);
+                imageView.setImage(cardImage);
+
+                mainAnchorPane.getChildren().add(imageView);
+
+            }
+        }
+    }
+
+
+    private void playGame() {
+        // Implement the game logic using the players and pile objects
+
+        // Créer un objet BackgroundFill avec la couleur de fond marron clair
+        Color lightBrownColor = Color.rgb(181, 136, 99); // Couleur marron clair
+        BackgroundFill backgroundFill = new BackgroundFill(lightBrownColor, null, null);
+        // Créer un objet Background avec le BackgroundFill
+        Background background = new Background(backgroundFill);
+        mainAnchorPane.setBackground(background);
+
+    }
+
+    public String setPlayerName(String playerName) {
+        return playerName;
+    }
+
+    public String setPlayerLastName(String playerLastName) {
+        return playerLastName;
+    }
+}
+
+

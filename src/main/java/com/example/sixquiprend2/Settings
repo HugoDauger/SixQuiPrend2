@@ -1,0 +1,15 @@
+package com.example.demo.Controler;
+
+import com.example.demo.Model.Player;
+
+public class Settings {
+    static Player[] players;
+
+    public static void setPlayers(Player[] players) {
+        Settings.players = players;
+    }
+
+    public static Player[] getPlayers() {
+        return players;
+    }
+}

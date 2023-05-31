@@ -9,20 +9,17 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.StrokeType;
+
 import static com.example.demo.Controler.Settings.players;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 
 public class CardGame {
@@ -31,6 +28,7 @@ public class CardGame {
     @FXML private HBox pile2;
     @FXML private HBox pile3;
     @FXML private HBox pile4;
+    @FXML private HBox playerCard;
     @FXML
     private AnchorPane mainAnchorPane;
 
@@ -57,6 +55,7 @@ public class CardGame {
 
     @FXML
     public void startGame(ActionEvent event) {
+
         mainAnchorPane.getChildren().clear();
         Image backgroundImage = new Image("D:\\Download\\demo\\src\\main\\resources\\com\\example\\demo\\img\\plateauje.png");
 
@@ -73,8 +72,25 @@ public class CardGame {
 
         DistribuerCarte();
 
+    }
 
 
+    public void refresh(){
+        pile1.getChildren().clear();
+        pile2.getChildren().clear();
+        pile3.getChildren().clear();
+        pile4.getChildren().clear();
+        for (int i = 0; i <4; i++){
+            HBox rowHBox = switch (i % 4) {
+                case 0 -> pile1;
+                case 1 -> pile2;
+                case 2 -> pile3;
+                case 3 -> pile4;
+                default -> null;
+            };
+
+
+        }
     }
     public void DistribuerCarte(){
         ArrayList<Card> cards = new ArrayList<Card>();
@@ -102,16 +118,51 @@ public class CardGame {
 
         int deck = 0;
         //Une carte par pile
-        for (int i = 0 ; i < 4; i++ ){
-            pile.get(i).addCard(cards.get(deck));
-            deck ++;
+        VBox cardContainer = new VBox();
+        cardContainer.setSpacing(16); // Set the spacing between each HBox container
 
+        for (int i = 0; i < 4; i++) {
+            HBox cardSet = new HBox();
+            cardSet.setSpacing(25); // Set the spacing between each card within the HBox
+
+            pile.get(i).addCard(cards.get(deck));
+            deck++;
+
+            int cardSetSize = pile.get(i).getCards().size(); // Get the number of cards in the pile
+
+            for (int j = 0; j < cardSetSize; j++) {
+                Card card = pile.get(i).getCard(j);
+                int startmarg = 240;
+                ImageView imageView = new ImageView();
+                imageView.setFitWidth(55);
+                imageView.setFitHeight(80);
+
+                // Set the position of the image view
+                imageView.setTranslateX(startmarg + j * (45 + 25)); // Adjust the margin accordingly
+                imageView.setTranslateY(200);
+
+                // Set the image based on the card's properties
+                String imagePath = "D:\\Download\\demo\\src\\main\\resources\\com\\example\\demo\\img\\" + card + ".png";
+                Image cardImage = new Image(imagePath);
+                imageView.setImage(cardImage);
+
+                cardSet.getChildren().add(imageView);
+            }
+
+            cardContainer.getChildren().add(cardSet);
         }
+
+        mainAnchorPane.getChildren().add(cardContainer);
+
+
+
+
         //Distribuer 10 cartes au joueur
         for (Player player : players){
             for (int i=0; i<10; i++){
                 player.addCard(cards.get(deck));
                 deck ++;
+
                 int margin = 25;
                 int startmargin = 60;
                 ImageView imageView = new ImageView();
@@ -126,11 +177,11 @@ public class CardGame {
                 String imagePath = "D:\\Download\\demo\\src\\main\\resources\\com\\example\\demo\\img\\" + cards.get(deck) + ".png";
                 Image cardImage = new Image(imagePath);
                 imageView.setImage(cardImage);
-
                 mainAnchorPane.getChildren().add(imageView);
 
             }
         }
+
     }
 
 

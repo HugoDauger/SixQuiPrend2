@@ -5,6 +5,10 @@ import com.example.demo.Model.Pile;
 import com.example.demo.Model.Player;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -16,19 +20,26 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
+import javafx.stage.Stage;
 
 import static com.example.demo.Controler.Settings.players;
 
+import java.io.IOException;
 import java.util.*;
 
 
 public class CardGame {
     public TextField playerNameField;
-    @FXML private HBox pile1;
-    @FXML private HBox pile2;
-    @FXML private HBox pile3;
-    @FXML private HBox pile4;
-    @FXML private HBox playerCard;
+    @FXML
+    private HBox pile1;
+    @FXML
+    private HBox pile2;
+    @FXML
+    private HBox pile3;
+    @FXML
+    private HBox pile4;
+    @FXML
+    private HBox playerCard;
     @FXML
     private AnchorPane mainAnchorPane;
 
@@ -37,28 +48,31 @@ public class CardGame {
     private Button startButton;
 
     private ArrayList<Pile> pile;
+
     public CardGame() {
         pile = new ArrayList<Pile>();
     }
+
     public String getPlayerName() {
         return playerNameField.getText();
     }
+
     public String getPlayerLastName() {
         return playerLastNameField.getText();
     }
 
+    private Map<Integer, Card> stockCard = new TreeMap<>();
+
     @FXML
     public void initialize() {
         // Initialize the UI components and set event handlers
-        startButton.setOnAction(this::startGame);
+        //startButton.setOnAction(this::startGame);
     }
 
     @FXML
-    public void startGame(ActionEvent event) {
+    public void startGame() {
 
-        mainAnchorPane.getChildren().clear();
         Image backgroundImage = new Image("D:\\Download\\demo\\src\\main\\resources\\com\\example\\demo\\img\\plateauje.png");
-
         // Create an ImageView with the loaded image
         ImageView backgroundImageView = new ImageView(backgroundImage);
 
@@ -68,20 +82,42 @@ public class CardGame {
 
         // Add the ImageView as the first child of the root pane
         mainAnchorPane.getChildren().add(0, backgroundImageView);
+        String playerName = playerNameField.getText();
+        String playerLastName = playerLastNameField.getText();
+        Player player = new Player(playerName, playerLastName);
+        List<Player> players = Settings.getPlayers();
+
+        players.add(player);
 
 
         DistribuerCarte();
+        createCard(0);
+
+    }
+    @FXML
+    private void loadBoardFXML(ActionEvent event) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/board.fxml"));
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        Parent root = loader.load();
+        Scene scene = new Scene(root);
+        String backgroundImageUrl = Objects.requireNonNull(getClass().getResource("/com/example/demo/img/plateauje.png")).toExternalForm();
+        scene.getRoot().setStyle("-fx-background-image: url('" + backgroundImageUrl + "'); -fx-background-size: contain; -fx-background-repeat: no-repeat; -fx-background-position: center center;");
+        stage.setScene(scene);
+        stage.centerOnScreen();
+        stage.show();
+
 
     }
 
 
-    public void refresh(){
+    public void refresh(int indexplayer) {
         pile1.getChildren().clear();
         pile2.getChildren().clear();
         pile3.getChildren().clear();
         pile4.getChildren().clear();
-        for (int i = 0; i <4; i++){
-            HBox rowHBox = switch (i % 4) {
+
+        for (int i = 0; i < 4; i++) {
+            HBox pileObj = switch (i % 4) {
                 case 0 -> pile1;
                 case 1 -> pile2;
                 case 2 -> pile3;
@@ -90,14 +126,74 @@ public class CardGame {
             };
 
 
+            for (int y = 0; y < pile.get(i).getCards().size(); y++) {
+                Rectangle rectangle = new Rectangle(55, 80);
+
+                int startmarg = 240;
+                pileObj.setTranslateX(startmarg + y * (45 + 25));
+                pileObj.setTranslateY(200);
+
+                int pileValue = pile.get(i).getCards().get(y).getValue(); // Use the card value instead of y
+                String imagePath = "D:\\Download\\demo\\src\\main\\resources\\com\\example\\demo\\img\\" + pileValue + ".png";
+                Image cardImage = new Image(imagePath);
+                ImageView imageView = new ImageView(cardImage);
+                imageView.setFitWidth(55);
+                imageView.setFitHeight(80);
+
+                mainAnchorPane.getChildren().add(imageView);
+            }
+        }
+
+    }
+
+
+
+    public void createCard(int indexplayer) {
+        refresh(indexplayer);
+        List<Card> cards = players.get(indexplayer).getCards();
+
+        for (int i = 0; i < cards.size(); i++) {
+            Rectangle rectangle = new Rectangle(55, 80);
+
+            StackPane stackPane = new StackPane(rectangle);
+            // Ajouter des EventHandlers pour les événements de la souris
+            stackPane.setOnMouseEntered(e -> {
+                stackPane.setTranslateY(670);
+                stackPane.setEffect(new DropShadow());
+            });
+            stackPane.setOnMouseExited(e -> {
+                stackPane.setTranslateY(680);
+                stackPane.setEffect(null);
+            });
+            mainAnchorPane.getChildren().add(stackPane);
+
+            // Set the position of the stack pane
+            int margin = 25;
+            int startmargin = 60;
+            stackPane.setTranslateX(startmargin + i * (45 + margin));
+            stackPane.setTranslateY(680);
+
+            // Set the image based on the card's value
+            int cardValue = cards.get(i).getValue();
+            String imagePath = "D:\\Download\\demo\\src\\main\\resources\\com\\example\\demo\\img\\" + cardValue + ".png";
+            Image cardImage = new Image(imagePath);
+            ImageView imageView = new ImageView(cardImage);
+            imageView.setFitWidth(55);
+            imageView.setFitHeight(80);
+            stackPane.getChildren().add(imageView);
+
+            final int indexCard = i;
         }
     }
-    public void DistribuerCarte(){
+
+
+
+    public void DistribuerCarte() {
         ArrayList<Card> cards = new ArrayList<Card>();
         pile.clear();
         cards.clear();
         // Creer 4 rangées de carte
-        for (int i = 0; i < 4 ; i++){
+        for (int i = 0; i < 4; i++) {
             pile.add(new Pile());
         }
         for (int i = 1; i <= 104; i++) {
@@ -118,92 +214,76 @@ public class CardGame {
 
         int deck = 0;
         //Une carte par pile
-        VBox cardContainer = new VBox();
-        cardContainer.setSpacing(16); // Set the spacing between each HBox container
+
 
         for (int i = 0; i < 4; i++) {
-            HBox cardSet = new HBox();
-            cardSet.setSpacing(25); // Set the spacing between each card within the HBox
-
             pile.get(i).addCard(cards.get(deck));
             deck++;
-
-            int cardSetSize = pile.get(i).getCards().size(); // Get the number of cards in the pile
-
-            for (int j = 0; j < cardSetSize; j++) {
-                Card card = pile.get(i).getCard(j);
-                int startmarg = 240;
-                ImageView imageView = new ImageView();
-                imageView.setFitWidth(55);
-                imageView.setFitHeight(80);
-
-                // Set the position of the image view
-                imageView.setTranslateX(startmarg + j * (45 + 25)); // Adjust the margin accordingly
-                imageView.setTranslateY(200);
-
-                // Set the image based on the card's properties
-                String imagePath = "D:\\Download\\demo\\src\\main\\resources\\com\\example\\demo\\img\\" + card + ".png";
-                Image cardImage = new Image(imagePath);
-                imageView.setImage(cardImage);
-
-                cardSet.getChildren().add(imageView);
-            }
-
-            cardContainer.getChildren().add(cardSet);
         }
-
-        mainAnchorPane.getChildren().add(cardContainer);
-
-
-
 
         //Distribuer 10 cartes au joueur
-        for (Player player : players){
-            for (int i=0; i<10; i++){
+        for (Player player : players) {
+            for (int i = 0; i < 10; i++) {
                 player.addCard(cards.get(deck));
-                deck ++;
-
-                int margin = 25;
-                int startmargin = 60;
-                ImageView imageView = new ImageView();
-                imageView.setFitWidth(55);
-                imageView.setFitHeight(80);
-
-                // Set the position of the image view
-                imageView.setTranslateX(startmargin + i * (45 + margin));
-                imageView.setTranslateY(680);
-
-                // Set the image based on the card's properties
-                String imagePath = "D:\\Download\\demo\\src\\main\\resources\\com\\example\\demo\\img\\" + cards.get(deck) + ".png";
-                Image cardImage = new Image(imagePath);
-                imageView.setImage(cardImage);
-                mainAnchorPane.getChildren().add(imageView);
+                deck++;
 
             }
         }
+    }
 
+    //Chose card
+    private void choose(int indexplayer, int indexcard) {
+        Card card = players.get(indexplayer).getCard(indexcard);
+        stockCard.put(indexplayer, card);
+        players.get(indexplayer).removeCard(indexcard);
+        if (indexplayer < players.size() - 1) {
+            indexplayer++;
+        } else {
+            List<Card> sorted = new ArrayList<>(stockCard.values());
+            Collections.sort(sorted, new Comparator<Card>() {
+                @Override
+                public int compare(Card c1, Card c2) {
+                    return Integer.compare(c1.getValue(), c2.getValue());
+                }
+            });
+            for (int i = 0; i < players.size(); i++) {
+                play(sorted.get(i), getKeyByValue(stockCard, sorted.get(i)));
+            }
+        }
     }
 
 
-    private void playGame() {
-        // Implement the game logic using the players and pile objects
-
-        // Créer un objet BackgroundFill avec la couleur de fond marron clair
-        Color lightBrownColor = Color.rgb(181, 136, 99); // Couleur marron clair
-        BackgroundFill backgroundFill = new BackgroundFill(lightBrownColor, null, null);
-        // Créer un objet Background avec le BackgroundFill
-        Background background = new Background(backgroundFill);
-        mainAnchorPane.setBackground(background);
-
+    private void play(Card card, int indexplayer) {
+        int indexPile = findPile(card.getValue(), indexplayer);
+        pile.get(indexPile).addCard(card);
+        refresh(indexplayer);
     }
 
-    public String setPlayerName(String playerName) {
-        return playerName;
+    private int findPile(int value, int indexplayer) {
+        int indexPile = -1;
+        int differenceMin = Integer.MAX_VALUE;
+        for (int i = 0; i < pile.size(); i++) {
+            int pileValue = pile.get(i).getCard(pile.get(i).getCardsNumber() - 1).getValue();
+            int difference = value - pileValue;
+            if (difference > 0 && difference < differenceMin) {
+                indexPile = i;
+                differenceMin = difference;
+            }
+        }
+        return indexPile;
     }
 
-    public String setPlayerLastName(String playerLastName) {
-        return playerLastName;
+    public <K, V> K getKeyByValue(Map<K, V> map, V value) {
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            if (value.equals(entry.getValue())) {
+                return entry.getKey();
+            }
+        }
+        return null;
     }
-}
+    }
+
+
+
 
 

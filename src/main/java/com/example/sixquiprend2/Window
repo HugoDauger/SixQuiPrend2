@@ -10,21 +10,17 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Window extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(Window.class.getResource("hello-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(Window.class.getResource("Window.fxml"));
         Parent root = fxmlLoader.load();
-        CardGame cardGameController= fxmlLoader.getController();
-        String playerName = cardGameController.getPlayerName();
-        String playerLastName = cardGameController.getPlayerLastName();
-
-        // Pass the player's name to the SetUp class
-        Player[] players = {new Player(playerName, playerLastName)};
+        List<Player> players = new ArrayList<>();
         Settings.setPlayers(players);
-
         stage.setTitle("Jeu du 6 qui prend");
         stage.setScene(new Scene(root, 1000, 800));
         stage.show();

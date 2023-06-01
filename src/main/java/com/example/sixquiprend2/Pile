@@ -1,5 +1,6 @@
 package com.example.demo.Model;
 
+import javafx.scene.layout.HBox;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -11,9 +12,11 @@ import java.util.Comparator;
 public class Pile {
     private ArrayList<Card> cards;
     private ArrayList<Pile> piles;
+    private HBox pileBox;
 
     public Pile() {
         cards = new ArrayList<>();
+        pileBox = new HBox(); // Initialisation de l'attribut HBox
     }
 
     /**
@@ -29,8 +32,15 @@ public class Pile {
         return cards.size();
     }
 
-    public Card getCard(int index) {
-        return cards.get(index);
+    public Card getCard(int indexcard) {
+        return cards.get(indexcard);
+    }
+    public HBox getPileBox() {
+        return pileBox;
+    }
+
+    public void setPileBox(HBox pileBox) {
+        this.pileBox = pileBox;
     }
 
 

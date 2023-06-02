@@ -3,15 +3,15 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane fx:id="mainAnchorPane" prefHeight="800.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.Controler.CardGame">
+<AnchorPane fx:id="mainAnchorPane" prefHeight="800.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.Controler.Fenetre">
     <Label layoutX="360.0" layoutY="148.0" text="First Name:" />
     <TextField fx:id="playerNameField" layoutX="362.0" layoutY="176.0" AnchorPane.leftAnchor="362.0" AnchorPane.rightAnchor="363.0" />
     <Label layoutX="361.0" layoutY="209.0" text="Last Name:" />
     <TextField fx:id="playerLastNameField" layoutX="361.0" layoutY="240.0" AnchorPane.leftAnchor="361.0" AnchorPane.rightAnchor="362.0" />
-    <Button fx:id="startButton" layoutX="462.0" layoutY="462.0" mnemonicParsing="false" onAction="#loadBoardFXML" text="Start Game" AnchorPane.leftAnchor="462.0" />
-    <CheckBox layoutX="362.0" layoutY="355.0" mnemonicParsing="false" text="IA" />
+    <Button fx:id="startButton" layoutX="462.0" layoutY="462.0" mnemonicParsing="false" onAction="#switchScene" text="Start Game" AnchorPane.leftAnchor="462.0" />
+    <CheckBox fx:id="aiCheckbox" layoutX="362.0" layoutY="355.0" mnemonicParsing="false" text="IA" />
     <Label layoutX="360.0" layoutY="273.0" text="Nombre de joueur" />
     <Label layoutX="367.0" layoutY="326.0" text="Mode IA" AnchorPane.leftAnchor="360.0" />
-   <Slider layoutX="360.0" layoutY="303.0" max="2.0" prefHeight="14.0" prefWidth="277.0" />
+    <Slider fx:id="slider" layoutX="360.0" layoutY="303.0" max="2.0" prefHeight="14.0" prefWidth="277.0" />
 
 </AnchorPane>

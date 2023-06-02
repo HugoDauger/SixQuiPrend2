@@ -1,8 +1,5 @@
 package com.example.demo;
 
-import com.example.demo.Controler.CardGame;
-import com.example.demo.Controler.Settings;
-import com.example.demo.Model.Player;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -15,16 +12,29 @@ import java.util.List;
 
 public class Window extends Application {
 
+    public Stage primaryStage;
+
+
     @Override
-    public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(Window.class.getResource("Window.fxml"));
-        Parent root = fxmlLoader.load();
-        List<Player> players = new ArrayList<>();
-        Settings.setPlayers(players);
-        stage.setTitle("Jeu du 6 qui prend");
-        stage.setScene(new Scene(root, 1000, 800));
-        stage.show();
+    public void start(Stage primaryStage) throws Exception {
+        this.primaryStage = primaryStage;
+        this.primaryStage.setTitle("6 qui prend");
+        Init();
+
     }
+    public void Init(){
+        try{
+            FXMLLoader start = new FXMLLoader();
+            start.setLocation(Window.class.getResource("Window.fxml"));
+            Parent root = start.load();
+            Scene scene = new Scene(root);
+            primaryStage.setScene(scene);
+            primaryStage.show();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     public static void main(String[] args) {
         launch();

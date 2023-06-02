@@ -1,10 +1,14 @@
 package com.example.demo.Controler;
 
 import com.example.demo.Model.Player;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class Settings {
-    static List<Player> players;
+
+    static List<Player> players = new ArrayList<>();
+    static boolean playWithAi; // Variable pour indiquer si le jeu est avec une IA ou non
 
     public static void setPlayers(List<Player> players) {
         Settings.players = players;
@@ -12,5 +16,13 @@ public class Settings {
 
     public static List<Player> getPlayers() {
         return players;
+    }
+
+    public static void setPlayWithAi(boolean value) {
+        playWithAi = value;
+    }
+
+    public static boolean isPlayWithAi() {
+        return playWithAi;
     }
 }

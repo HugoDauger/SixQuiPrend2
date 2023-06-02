@@ -3,25 +3,25 @@ package com.example.demo.Controler;
 import com.example.demo.Model.Card;
 import com.example.demo.Model.Pile;
 import com.example.demo.Model.Player;
+import com.example.demo.Window;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.control.*;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.StrokeType;
 import javafx.stage.Stage;
 
+import static com.example.demo.Controler.Settings.playWithAi;
 import static com.example.demo.Controler.Settings.players;
 
 import java.io.IOException;
@@ -29,7 +29,7 @@ import java.util.*;
 
 
 public class CardGame {
-    public TextField playerNameField;
+
     @FXML
     private HBox pile1;
     @FXML
@@ -41,73 +41,65 @@ public class CardGame {
     @FXML
     private HBox playerCard;
     @FXML
-    private AnchorPane mainAnchorPane;
+    private AnchorPane mainAnchorPane1;
 
-    public TextField playerLastNameField;
+    @FXML private Label scoreBoard;
+    @FXML private Label roundLabel;
+    @FXML private Label playerLabel;
     @FXML
-    private Button startButton;
+    private ImageView backgroundImage;
+    @FXML
+    private StackPane backgroundPane;
+
+    private Stage primaryStage;
+    private Scene scene;
+    private Parent root;
+
+
+    int nRound = 1;
 
     private ArrayList<Pile> pile;
 
     public CardGame() {
         pile = new ArrayList<Pile>();
     }
-
-    public String getPlayerName() {
-        return playerNameField.getText();
-    }
-
-    public String getPlayerLastName() {
-        return playerLastNameField.getText();
-    }
-
     private Map<Integer, Card> stockCard = new TreeMap<>();
 
-    @FXML
     public void initialize() {
-        // Initialize the UI components and set event handlers
-        //startButton.setOnAction(this::startGame);
-    }
-
-    @FXML
-    public void startGame() {
-
-        Image backgroundImage = new Image("D:\\Download\\demo\\src\\main\\resources\\com\\example\\demo\\img\\plateauje.png");
-        // Create an ImageView with the loaded image
-        ImageView backgroundImageView = new ImageView(backgroundImage);
-
-        // Set the size of the ImageView to match the scene
-        backgroundImageView.fitWidthProperty().bind(mainAnchorPane.widthProperty());
-        backgroundImageView.fitHeightProperty().bind(mainAnchorPane.heightProperty());
-
-        // Add the ImageView as the first child of the root pane
-        mainAnchorPane.getChildren().add(0, backgroundImageView);
-        String playerName = playerNameField.getText();
-        String playerLastName = playerLastNameField.getText();
-        Player player = new Player(playerName, playerLastName);
-        List<Player> players = Settings.getPlayers();
-
-        players.add(player);
 
 
+
+
+        scoreBoard = new Label();
+        refreshScore();
         DistribuerCarte();
         createCard(0);
+        hideCard(0);
 
     }
-    @FXML
-    private void loadBoardFXML(ActionEvent event) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/demo/board.fxml"));
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        Parent root = loader.load();
-        Scene scene = new Scene(root);
-        String backgroundImageUrl = Objects.requireNonNull(getClass().getResource("/com/example/demo/img/plateauje.png")).toExternalForm();
-        scene.getRoot().setStyle("-fx-background-image: url('" + backgroundImageUrl + "'); -fx-background-size: contain; -fx-background-repeat: no-repeat; -fx-background-position: center center;");
-        stage.setScene(scene);
-        stage.centerOnScreen();
-        stage.show();
 
-
+    public void switchSceneall(String fxml) throws IOException {
+        FXMLLoader sce = new FXMLLoader(getClass().getResource(fxml));
+        sce.setLocation(Window.class.getResource(fxml));
+        root = sce.load();
+        scene = new Scene(root);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+        CardGame controller = sce.getController();
+        controller.initialize();
     }
+
+    public void sceneback(ActionEvent event) throws IOException {
+        playerCard.getChildren().clear();
+        pile1.getChildren().clear();
+        pile2.getChildren().clear();
+        pile3.getChildren().clear();
+        pile4.getChildren().clear();
+        primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        switchSceneall("Window.fxml");
+    }
+
+
 
 
     public void refresh(int indexplayer) {
@@ -117,7 +109,7 @@ public class CardGame {
         pile4.getChildren().clear();
 
         for (int i = 0; i < 4; i++) {
-            HBox pileObj = switch (i % 4) {
+            HBox pileObj = switch (i) {
                 case 0 -> pile1;
                 case 1 -> pile2;
                 case 2 -> pile3;
@@ -128,64 +120,68 @@ public class CardGame {
 
             for (int y = 0; y < pile.get(i).getCards().size(); y++) {
                 Rectangle rectangle = new Rectangle(55, 80);
-
-                int startmarg = 240;
-                pileObj.setTranslateX(startmarg + y * (45 + 25));
-                pileObj.setTranslateY(200);
-
                 int pileValue = pile.get(i).getCards().get(y).getValue(); // Use the card value instead of y
                 String imagePath = "D:\\Download\\demo\\src\\main\\resources\\com\\example\\demo\\img\\" + pileValue + ".png";
                 Image cardImage = new Image(imagePath);
                 ImageView imageView = new ImageView(cardImage);
                 imageView.setFitWidth(55);
                 imageView.setFitHeight(80);
-
-                mainAnchorPane.getChildren().add(imageView);
+                StackPane stackPane = new StackPane(rectangle,imageView);
+                pileObj.getChildren().add(stackPane);
             }
         }
 
     }
 
 
-
     public void createCard(int indexplayer) {
         refresh(indexplayer);
+        playerCard.getChildren().clear();
+
         List<Card> cards = players.get(indexplayer).getCards();
 
         for (int i = 0; i < cards.size(); i++) {
             Rectangle rectangle = new Rectangle(55, 80);
-
-            StackPane stackPane = new StackPane(rectangle);
-            // Ajouter des EventHandlers pour les événements de la souris
-            stackPane.setOnMouseEntered(e -> {
-                stackPane.setTranslateY(670);
-                stackPane.setEffect(new DropShadow());
-            });
-            stackPane.setOnMouseExited(e -> {
-                stackPane.setTranslateY(680);
-                stackPane.setEffect(null);
-            });
-            mainAnchorPane.getChildren().add(stackPane);
-
-            // Set the position of the stack pane
-            int margin = 25;
-            int startmargin = 60;
-            stackPane.setTranslateX(startmargin + i * (45 + margin));
-            stackPane.setTranslateY(680);
-
-            // Set the image based on the card's value
+            int startmarg=20;
             int cardValue = cards.get(i).getValue();
             String imagePath = "D:\\Download\\demo\\src\\main\\resources\\com\\example\\demo\\img\\" + cardValue + ".png";
             Image cardImage = new Image(imagePath);
             ImageView imageView = new ImageView(cardImage);
             imageView.setFitWidth(55);
             imageView.setFitHeight(80);
-            stackPane.getChildren().add(imageView);
+
+
+            StackPane stackPane = new StackPane(rectangle,imageView);
+            stackPane.setTranslateX( startmarg +i * (10));
+            // Ajouter des EventHandlers pour les événements de la souris
+            stackPane.setOnMouseEntered(e -> {
+                stackPane.setTranslateY(-10);
+                stackPane.setEffect(new DropShadow());
+            });
+            stackPane.setOnMouseExited(e -> {
+                stackPane.setTranslateY(0);
+                stackPane.setEffect(null);
+            });
+            playerCard.getChildren().add(stackPane);
+
+
+
+            // Set the image based on the card's value
+
+
+
 
             final int indexCard = i;
+            if (!playWithAi || indexplayer == 0) {
+                stackPane.setOnMouseClicked(event -> choose(indexCard, indexplayer));
+
+            }
+        }
+        if (playWithAi && indexplayer != 0) {
+            final int randomIndex = (int) (Math.random() * players.get(indexplayer).getCards().size());
+            choose(randomIndex, indexplayer);
         }
     }
-
 
 
     public void DistribuerCarte() {
@@ -231,11 +227,12 @@ public class CardGame {
         }
     }
 
+
     //Chose card
-    private void choose(int indexplayer, int indexcard) {
-        Card card = players.get(indexplayer).getCard(indexcard);
+    private void choose(int indexplayer, int indexCard) {
+        Card card = players.get(indexplayer).getCard(indexCard);
         stockCard.put(indexplayer, card);
-        players.get(indexplayer).removeCard(indexcard);
+        players.get(indexplayer).removeCard(indexCard);
         if (indexplayer < players.size() - 1) {
             indexplayer++;
         } else {
@@ -249,6 +246,8 @@ public class CardGame {
             for (int i = 0; i < players.size(); i++) {
                 play(sorted.get(i), getKeyByValue(stockCard, sorted.get(i)));
             }
+            indexplayer = 0;
+            stockCard.clear();
         }
     }
 
@@ -270,6 +269,67 @@ public class CardGame {
                 differenceMin = difference;
             }
         }
+        if (indexPile < 0) {
+            // Choose pile with dialog box
+            if (indexplayer==0||!playWithAi) {
+                hideCard(indexplayer);
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Choose a pile, " + players.get(indexplayer).getName().toUpperCase());
+                alert.setHeaderText("No available pile for card value " + value);
+                alert.setContentText("Please choose a pile to add the card to:");
+                ToggleGroup toggleGroup = new ToggleGroup();
+                RadioButton pile1RadioButton = new RadioButton("Pile 1");
+                pile1RadioButton.setToggleGroup(toggleGroup);
+                RadioButton pile2RadioButton = new RadioButton("Pile 2");
+                pile2RadioButton.setToggleGroup(toggleGroup);
+                RadioButton pile3RadioButton = new RadioButton("Pile 3");
+                pile3RadioButton.setToggleGroup(toggleGroup);
+                RadioButton pile4RadioButton = new RadioButton("Pile 4");
+                pile4RadioButton.setToggleGroup(toggleGroup);
+
+                VBox vbox = new VBox(10);
+                vbox.getChildren().addAll(pile1RadioButton, pile2RadioButton, pile3RadioButton, pile4RadioButton);
+                alert.getDialogPane().setContent(vbox);
+
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.isPresent() && result.get() == ButtonType.OK) {
+                    if (pile1RadioButton.isSelected()) {
+                        indexPile = 0;
+                    } else if (pile2RadioButton.isSelected()) {
+                        indexPile = 1;
+                    } else if (pile3RadioButton.isSelected()) {
+                        indexPile = 2;
+                    } else if (pile4RadioButton.isSelected()) {
+                        indexPile = 3;
+                    } else {
+                        indexPile = 0;
+                    }
+                } else {
+                    indexPile = 0;
+                }
+            }else{
+                //AI
+                int maxHeads = pile.get(0).totalHeads();
+                for (int i = 1; i < pile.size()-1; i++) {
+                    int currentHeads = pile.get(i).totalHeads();
+                    if (currentHeads < maxHeads) {
+                        maxHeads = currentHeads;
+                        System.out.println(pile.get(i).totalHeads());
+                        indexPile = i;
+                    }else{indexPile = 0;}
+                }
+            }
+            int addPoint= addPoint(indexPile);
+            players.get(indexplayer).score(addPoint);
+            refreshScore();
+            pile.get(indexPile).getCards().clear();
+        }
+        if (pile.get(indexPile).getCardsNumber() >= 5) {
+            int addPoint= addPoint(indexPile);
+            players.get(indexplayer).score(addPoint);
+            refreshScore();
+            pile.get(indexPile).getCards().clear();
+        }
         return indexPile;
     }
 
@@ -281,8 +341,90 @@ public class CardGame {
         }
         return null;
     }
+
+
+
+    /**
+     * add the total number of bull heads of a pile to addPoint
+     * @param indexPile the index of the pile where we are adding the bull heads of each card
+     * @return the number of bull heads
+     */
+    public int addPoint(int indexPile){
+        int addPoint = 0;
+        for (int i = 0; i < pile.get(indexPile).getCards().size(); i++){
+            addPoint += pile.get(indexPile).getCards().get(i).getHeads();
+        }
+        return addPoint;
     }
 
+    /**
+     * display the last score of each player
+     */
+    public void refreshScore(){
+        String scoreString="";
+        for (Player player : players) {
+
+            scoreString += player.getName().toUpperCase() + " : " + player.getScore() + " beef heads\n";
+        }
+        scoreBoard.setText(scoreString);
+    }
+
+
+    /**
+     * hide the card of a player + check if the game is finished (if not give new cards for each player and start a new round)
+     * @param indexplayer hide the card of the playerN
+     */
+    private void hideCard(int indexplayer) {
+        int checkEnd = 0;
+        if (players.get(indexplayer).getCards().size()==0){
+            for(int i=0;i<players.size();i++) {
+                if(players.get(i).getScore()>=66){
+                    checkEnd++;
+                }
+            }if (checkEnd>0){
+                int minScore = Integer.MAX_VALUE;
+                Player winner = null;
+                for (Player p : players) {
+                    int score = p.getScore();
+                    if (score < minScore) {
+                        minScore = score;
+                        winner = p;
+                    }
+                }
+                roundLabel.setText("GAME OVER");
+                assert winner != null;
+           //     playerLabel.setText("WINNER: "+winner.getName().toUpperCase());
+            }else{
+                nRound++;
+                roundLabel.setText("ROUND "+nRound);
+                DistribuerCarte();
+            }
+        }
+       /* if (checkEnd==0){
+            playerLabel.setText("It's your turn "+players.get(indexplayer).getName().toUpperCase());
+        }*/
+        if(indexplayer!=0 && playWithAi) {
+            createCard(indexplayer);
+        }else{
+            for (Node node : playerCard.getChildren()) {
+                if (node instanceof StackPane) {
+                    StackPane stackPane = (StackPane) node;
+                    if (stackPane.getChildren().size() > 1) {
+                        Rectangle rectangle = (Rectangle) ((StackPane) node).getChildren().get(0);
+                        rectangle.setFill(Color.rgb(125,0,0));
+                        /*Label label = () stackPane.getChildren().get(1);
+                        Label heads = (Label) stackPane.getChildren().get(2);// Récupérer le label
+                        label.setVisible(false);// Cacher le label
+                        heads.setVisible(false);
+
+                         */
+                        stackPane.setOnMouseClicked(event -> createCard(indexplayer)); // Ajouter un événement de clic pour révéler le label
+                    }
+                }
+            }
+        }
+    }
+    }
 
 
 

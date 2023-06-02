@@ -1,0 +1,82 @@
+package com.example.demo.Controler;
+
+import com.example.demo.Model.Player;
+import com.example.demo.Window;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Slider;
+import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.List;
+import java.util.Objects;
+import java.util.ResourceBundle;
+
+public class Fenetre implements Initializable {
+    @FXML
+    private AnchorPane mainAnchorPane;
+    @FXML
+    private TextField playerNameField;
+    @FXML
+    private TextField playerLastNameField;
+    @FXML
+    private CheckBox aiCheckbox;
+    private Stage primaryStage;
+    private Scene scene;
+    private Parent root;
+    public void switchScene(ActionEvent event) throws IOException {
+        primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        String playerName = playerNameField.getText();
+        String playerLastName = playerLastNameField.getText();
+        Player player = new Player(playerName, playerLastName);
+
+        // Vérifiez si la case à cocher est cochée
+        boolean playWithAi = aiCheckbox.isSelected();
+
+        // Configurez les paramètres dans la classe Settings
+        Settings.setPlayWithAi(playWithAi);
+
+        // Obtenez la liste de joueurs depuis Settings
+        List<Player> players = Settings.getPlayers();
+
+        // Ajoutez le joueur à la liste des joueurs
+        players.add(player);
+
+        primaryStage =(Stage)((Node)event.getSource()).getScene().getWindow();
+        switchSceneall("board.fxml");
+
+        String backgroundImageUrl = Objects.requireNonNull(getClass().getResource("/com/example/demo/img/plateauje.png")).toExternalForm();
+        scene.getRoot().setStyle("-fx-background-image: url('" + backgroundImageUrl + "'); -fx-background-size: contain; -fx-background-repeat: no-repeat; -fx-background-position: center center;");
+    }
+
+
+
+
+    public void switchSceneall(String fxml) throws IOException{
+        FXMLLoader sce = new FXMLLoader(getClass().getResource(fxml));
+        sce.setLocation(Window.class.getResource(fxml));
+        root = sce.load();
+        scene = new Scene(root);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+
+
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+
+    }
+}
